@@ -1,5 +1,5 @@
 import { Controller } from 'egg';
-import { retFail, retOk, retOkWithTotal } from '../resultor';
+import { retFail, retOk, retOkWithPaging } from '../resultor';
 import { Record, TRecord } from '../model/record';
 import { ObjectID } from 'mongodb';
 
@@ -161,10 +161,11 @@ export default class RecordController extends Controller {
         .sort(sort)
         .skip(skip)
         .limit(limit);
-      const list = await res.toArray();
+      const hasNext = await res.hasNext();
       const count = await res.count();
+      const list = await res.toArray();
 
-      retOkWithTotal(ctx, list, count);
+      retOkWithPaging(ctx, list, count, hasNext);
     } catch (e) {
       retFail(ctx, e);
     }

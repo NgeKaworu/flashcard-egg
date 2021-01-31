@@ -9,12 +9,18 @@ export function retOk(ctx: Context, data: any) {
   ctx.body = res;
 }
 
-// retOkWithTotal 成功处理器
-export function retOkWithTotal(ctx: Context, data: any, total: number) {
+// retOkWithPaging 成功处理器带分页信息
+export function retOkWithPaging(
+  ctx: Context,
+  data: any,
+  total: number,
+  hasNext: boolean,
+) {
   const res = {
     ok: true,
     data,
     total,
+    hasNext,
   };
   ctx.body = res;
 }

@@ -17,7 +17,7 @@ export default (appInfo: EggAppInfo) => {
   config.keys = appInfo.name + '_1611937511671_9018';
 
   // add your egg config in here
-  config.middleware = [];
+  config.middleware = ['isLogin'];
 
   // add your special config in here
   const bizConfig = {

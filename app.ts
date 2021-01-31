@@ -15,7 +15,7 @@ export default class Main implements IBoot {
     // this is the last chance to modify the config.
 
     // 加载全局中间件
-    this.app.config.coreMiddleware.unshift('isLogin');
+    // this.app.config.coreMiddleware.unshift('isLogin');
   }
 
   configDidLoad() {

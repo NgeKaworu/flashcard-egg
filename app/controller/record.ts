@@ -18,6 +18,7 @@ export default class RecordController extends Controller {
         ...ctx.request.body,
         uid: new ObjectID(ctx.uid),
         createAt: new Date(),
+        cooldownAt: new Date(),
         inReview: false,
         exp: 0,
       };
@@ -95,6 +96,7 @@ export default class RecordController extends Controller {
     } = this;
 
     try {
+      const query = ctx.query;
       ctx.validate(
         {
           type: {
@@ -102,33 +104,53 @@ export default class RecordController extends Controller {
             required: false,
             values: ['enabled', 'cooling', 'done'],
           },
-          sort: 'int?',
-          orderBy: 'int?',
+          sort: 'string?',
+          orderby: { type: 'int', reqired: false, values: [1, -1] },
           skip: 'int?',
           limit: 'int?',
         },
-        ctx.query,
+        query,
       );
 
-      // undo
-      const record: Record = {
-        ...ctx.request.body,
-        updateAt: new Date(),
-        cooldownAt: new Date(),
-        inReview: false,
-        exp: 0,
+      const filter: { [key: string]: any } = {
+        uid: new ObjectID(ctx.uid),
       };
 
-      const id = new ObjectID(record.id);
-      delete record.id;
+      // type 条件判断
+      if (query.type) {
+        switch (query.type) {
+          case 'enable':
+            filter.cooldownAt = {
+              $lte: new Date(),
+            };
+            break;
+          case 'cooling':
+            filter.cooldownAt = {
+              $gt: new Date(),
+            };
+            break;
+          case 'done':
+            filter.exp = 100;
+            break;
+          default:
+            ctx.logger.warn('invalidate type: ', query.type);
+            break;
+        }
+      }
 
-      const res = await db
-        .collection(TRecord)
-        .findOneAndUpdate(
-          { _id: id, uid: new ObjectID(ctx.uid) },
-          { $set: record },
-        );
-      retOk(ctx, res.ok);
+      // 分布逻辑
+      let skip = query.skip || 0,
+        limit = query.limit || 10;
+
+      // 排序逻辑
+      let sort: { [key: string]: 1 | -1 } = {};
+      if (query.sort && query.orderby) {
+        sort = {
+          [query.sort]: query.orderby,
+        };
+      }
+
+      db.collection(TRecord).find(filter).sort(sort).skip(skip).limit(limit);
     } catch (e) {
       retFail(ctx, e);
     }

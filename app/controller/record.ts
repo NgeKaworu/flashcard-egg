@@ -1,5 +1,5 @@
 import { Controller } from 'egg';
-import { retFail, retOk } from '../resultor';
+import { retFail, retOk, retOkWithTotal } from '../resultor';
 import { Record, TRecord } from '../model/record';
 import { ObjectID } from 'mongodb';
 
@@ -105,9 +105,14 @@ export default class RecordController extends Controller {
             values: ['enabled', 'cooling', 'done'],
           },
           sort: 'string?',
-          orderby: { type: 'int', reqired: false, values: [1, -1] },
-          skip: 'int?',
-          limit: 'int?',
+          orderby: {
+            type: 'int',
+            required: false,
+            values: [1, -1],
+            convertType: 'int',
+          },
+          skip: { type: 'int', required: false, convertType: 'int' },
+          limit: { type: 'int', required: false, convertType: 'int' },
         },
         query,
       );
@@ -150,7 +155,16 @@ export default class RecordController extends Controller {
         };
       }
 
-      db.collection(TRecord).find(filter).sort(sort).skip(skip).limit(limit);
+      const res = db
+        .collection(TRecord)
+        .find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit);
+      const list = await res.toArray();
+      const count = await res.count();
+
+      retOkWithTotal(ctx, list, count);
     } catch (e) {
       retFail(ctx, e);
     }

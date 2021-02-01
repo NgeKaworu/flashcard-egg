@@ -148,9 +148,12 @@ export default class RecordController extends Controller {
         limit = query.limit || 10;
 
       // 排序逻辑
-      let sort: { [key: string]: 1 | -1 } = {};
+      let sort: { [key: string]: 1 | -1 } = {
+        createAt: -1,
+      };
       if (query.sort && query.orderby) {
         sort = {
+          ...sort,
           [query.sort]: query.orderby,
         };
       }

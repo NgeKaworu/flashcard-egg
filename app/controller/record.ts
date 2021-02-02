@@ -173,4 +173,113 @@ export default class RecordController extends Controller {
       retFail(ctx, e);
     }
   }
+
+  // 选中单词加入复习
+  public async review() {
+    const {
+      ctx,
+      app: { db },
+    } = this;
+    try {
+      ctx.validate({
+        ids: {
+          type: 'array',
+          itemType: '_id',
+        },
+      });
+      const filter = {
+        uid: new ObjectID(ctx.uid),
+        _id: { $in: ctx.request.body.ids?.map(new ObjectID()) },
+      };
+      const res = await db.collection(TRecord).updateMany(filter, {
+        $set: {
+          inReview: true,
+        },
+      });
+      retOk(ctx, res.result);
+    } catch (e) {
+      retFail(ctx, e);
+    }
+  }
+
+  // 随机挑选几个单词复习
+  public async randomReview() {
+    const {
+      ctx,
+      app: { db },
+    } = this;
+    try {
+      ctx.validate({
+        num: 'int?',
+      });
+      const uid = new ObjectID(ctx.uid);
+      const matcher = {
+        uid,
+        inReview: false,
+        cooldownAt: {
+          $lte: new Date(),
+        },
+      };
+      const tRecord = db.collection(TRecord);
+      const num = ctx.request.body.num || 3;
+      const cursor = tRecord.aggregate([
+        { $match: matcher },
+        { $sample: { size: num } },
+        { $project: { _id: 1 } },
+      ]);
+
+      const random = await cursor.toArray();
+      const ids = random.map((i) => new ObjectID(i?._id));
+
+      const filter = {
+        uid: new ObjectID(ctx.uid),
+        _id: { $in: ids },
+      };
+      const res = await db.collection(TRecord).updateMany(filter, {
+        $set: {
+          inReview: true,
+        },
+      });
+
+      retOk(ctx, res.result);
+    } catch (e) {
+      retFail(ctx, e);
+    }
+  }
+
+  // 设置复习结果，算法前端实现，后端只负责记录
+  public async setReviewResult() {
+    const {
+      ctx,
+      app: { db },
+    } = this;
+    try {
+      ctx.validate({
+        id: { type: '_id' },
+        cooldownAt: 'date',
+        exp: 'int',
+      });
+
+      const body = ctx.request.body;
+      const record: Record = {
+        ...body,
+        cooldownAt: new Date(body?.cooldownAt),
+        inReview: false,
+        reviewAt: new Date(),
+      };
+
+      const id = new ObjectID(record.id);
+      delete record.id;
+
+      const res = await db
+        .collection(TRecord)
+        .findOneAndUpdate(
+          { _id: id, uid: new ObjectID(ctx.uid) },
+          { $set: record },
+        );
+      retOk(ctx, res.ok);
+    } catch (e) {
+      retFail(ctx, e);
+    }
+  }
 }

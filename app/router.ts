@@ -8,6 +8,6 @@ export default (app: Application) => {
   router.patch('/record/update', controller.record.update);
   router.get('/record/list', controller.record.list);
   router.patch('/record/review', controller.record.review)
-  router.patch('/record/randomReview', controller.record.randomReview)
-  router.patch('/record/setReviewResult', controller.record.setReviewResult)
+  router.patch('/record/random-review', controller.record.randomReview)
+  router.patch('/record/set-review-result', controller.record.setReviewResult)
 };

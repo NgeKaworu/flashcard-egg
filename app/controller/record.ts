@@ -113,6 +113,7 @@ export default class RecordController extends Controller {
           },
           skip: { type: 'int', required: false, convertType: 'int' },
           limit: { type: 'int', required: false, convertType: 'int' },
+          inReview: 'boolean?'
         },
         query,
       );
@@ -187,9 +188,11 @@ export default class RecordController extends Controller {
           itemType: '_id',
         },
       });
+      const body = ctx.request.body;
+
       const filter = {
         uid: new ObjectID(ctx.uid),
-        _id: { $in: ctx.request.body.ids?.map(new ObjectID()) },
+        _id: { $in: body.ids?.map(ObjectID.createFromHexString) },
       };
       const res = await db.collection(TRecord).updateMany(filter, {
         $set: {

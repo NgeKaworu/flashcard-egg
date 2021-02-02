@@ -26,6 +26,7 @@
     "egg-cors": "^2.2.3",
     "egg-scripts": "^2.6.0",
     "egg-validate": "^2.0.2",
+    "moment": "^2.29.1",
     "mongodb": "^3.6.3"
   },
   "devDependencies": {

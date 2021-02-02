@@ -2,6 +2,7 @@ import { Application, IBoot } from 'egg';
 import { MongoClient, ObjectID } from 'mongodb';
 import initDB from './db';
 
+const moment = require('moment');
 export default class Main implements IBoot {
   private readonly app: Application;
 
@@ -13,7 +14,6 @@ export default class Main implements IBoot {
     // Ready to call configDidLoad,
     // Config, plugin files are referred,
     // this is the last chance to modify the config.
-
     // 加载全局中间件
     // this.app.config.coreMiddleware.unshift('isLogin');
   }
@@ -52,6 +52,10 @@ export default class Main implements IBoot {
     // validator 自定义规则
     this.app.validator.addRule('_id', (_, value) => {
       return !ObjectID.isValid(value) ? 'not object id' : undefined;
+    });
+
+    this.app.validator.addRule('moment', (_, value) => {
+      return !moment(value).isValid() ? 'not moment' : undefined;
     });
   }
 

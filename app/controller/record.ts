@@ -39,7 +39,7 @@ export default class RecordController extends Controller {
     try {
       ctx.validate(
         {
-          id: { type: '_id' },
+          id: '_id',
         },
         ctx.params,
       );
@@ -61,7 +61,7 @@ export default class RecordController extends Controller {
     } = this;
     try {
       ctx.validate({
-        id: { type: '_id' },
+        id: '_id',
         source: { type: 'string', required: false },
         translation: { type: 'string', required: false },
       });
@@ -97,6 +97,15 @@ export default class RecordController extends Controller {
 
     try {
       const query = ctx.query;
+      const inReview = query.inReview;
+      if (inReview) {
+        if (inReview === 'true') {
+          query.inReview = true;
+        }
+        if (inReview === 'false') {
+          query.inReview = false;
+        }
+      }
       ctx.validate(
         {
           type: {
@@ -113,7 +122,7 @@ export default class RecordController extends Controller {
           },
           skip: { type: 'int', required: false, convertType: 'int' },
           limit: { type: 'int', required: false, convertType: 'int' },
-          inReview: 'boolean?'
+          inReview: 'boolean?',
         },
         query,
       );
@@ -121,6 +130,10 @@ export default class RecordController extends Controller {
       const filter: { [key: string]: any } = {
         uid: new ObjectID(ctx.uid),
       };
+
+      if (inReview) {
+        filter.inReview = query.inReview;
+      }
 
       // type 条件判断
       if (query.type) {
@@ -258,8 +271,8 @@ export default class RecordController extends Controller {
     } = this;
     try {
       ctx.validate({
-        id: { type: '_id' },
-        cooldownAt: 'date',
+        id: '_id',
+        cooldownAt: 'moment',
         exp: 'int',
       });
 

@@ -5,6 +5,6 @@ export default (app: Application) => {
 
   router.post('/record/create', controller.record.create);
   router.delete('/record/remove/:id', controller.record.remove);
-  router.put('/record/update', controller.record.update);
+  router.patch('/record/update', controller.record.update);
   router.get('/record/list', controller.record.list);
 };

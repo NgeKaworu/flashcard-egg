@@ -158,7 +158,7 @@ export default class RecordController extends Controller {
       }
 
       // 分布逻辑
-      let skip = query.skip || 0,
+      const skip = query.skip || 0,
         limit = query.limit || 10;
 
       // 排序逻辑
@@ -245,7 +245,7 @@ export default class RecordController extends Controller {
       ]);
 
       const random = await cursor.toArray();
-      const ids = random.map((i) => new ObjectID(i?._id));
+      const ids = random.map(i => new ObjectID(i?._id));
 
       const filter = {
         uid: new ObjectID(ctx.uid),

@@ -2,7 +2,7 @@ import { Application, IBoot } from 'egg';
 import { MongoClient, ObjectID } from 'mongodb';
 import initDB from './db';
 
-const moment = require('moment');
+import moment = require('moment');
 export default class Main implements IBoot {
   private readonly app: Application;
 

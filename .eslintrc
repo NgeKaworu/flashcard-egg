@@ -3,5 +3,7 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
-  "array-bracket-spacing": false
+  "rules": {
+    "array-bracket-spacing": 0
+  }
 }

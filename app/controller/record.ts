@@ -111,7 +111,7 @@ export default class RecordController extends Controller {
           type: {
             type: 'enum',
             required: false,
-            values: ['enabled', 'cooling', 'done'],
+            values: ['enable', 'cooling', 'done'],
           },
           sort: 'string?',
           orderby: {

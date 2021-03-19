@@ -4,7 +4,8 @@ import * as mongodb from 'mongodb';
 export const TRecord = 't_record';
 
 export interface Record {
-  id?: mongodb.ObjectID; // id
+  _id?: mongodb.ObjectID; // id
+  id?: string; // id
   uid?: mongodb.ObjectID; // 所有者id
   createAt?: Date; // 创建时间
   updateAt?: Date; // 更新时间

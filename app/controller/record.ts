@@ -138,12 +138,15 @@ export default class RecordController extends Controller {
       // type 条件判断
       if (query.type) {
         switch (query.type) {
-          case 'enable':
+          case 'enable': {
             filter.cooldownAt = {
               $lte: new Date(),
-              exp: { $ne: 100 },
+            };
+            filter.exp = {
+              $ne: 100,
             };
             break;
+          }
           case 'cooling':
             filter.cooldownAt = {
               $gt: new Date(),
@@ -240,14 +243,14 @@ export default class RecordController extends Controller {
       };
       const tRecord = db.collection(TRecord);
       const num = ctx.request.body.num || 3;
-      const cursor = tRecord.aggregate([
+      const cursor = tRecord.aggregate<Record>([
         { $match: matcher },
         { $sample: { size: num } },
         { $project: { _id: 1 } },
       ]);
 
       const random = await cursor.toArray();
-      const ids = random.map(i => new ObjectID(i?._id));
+      const ids = random.map((i: Record) => new ObjectID(i?._id));
 
       const filter = {
         uid: new ObjectID(ctx.uid),

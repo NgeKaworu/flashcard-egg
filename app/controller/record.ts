@@ -232,6 +232,7 @@ export default class RecordController extends Controller {
       const matcher = {
         uid,
         inReview: false,
+        exp: { $ne: 100 },
         cooldownAt: {
           $lte: new Date(),
         },
@@ -245,7 +246,7 @@ export default class RecordController extends Controller {
       ]);
 
       const random = await cursor.toArray();
-      const ids = random.map(i => new ObjectID(i?._id));
+      const ids = random.map((i) => new ObjectID(i?._id));
 
       const filter = {
         uid: new ObjectID(ctx.uid),

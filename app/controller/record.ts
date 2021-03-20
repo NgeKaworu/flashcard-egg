@@ -236,7 +236,6 @@ export default class RecordController extends Controller {
       const matcher = {
         uid,
         inReview: false,
-        exp: { $ne: 100 },
         cooldownAt: {
           $lte: new Date(),
         },
@@ -299,6 +298,29 @@ export default class RecordController extends Controller {
           { $set: record },
         );
       retOk(ctx, res.ok);
+    } catch (e) {
+      retFail(ctx, e);
+    }
+  }
+
+  // 复习所有
+  public async reviewAll() {
+    const {
+      ctx,
+      app: { db },
+    } = this;
+    try {
+      const filter = {
+        uid: new ObjectID(ctx.uid),
+        exp: { $ne: 100 },
+      };
+
+      const res = await db.collection(TRecord).updateMany(filter, {
+        $set: {
+          inReview: true,
+        },
+      });
+      retOk(ctx, res.result);
     } catch (e) {
       retFail(ctx, e);
     }

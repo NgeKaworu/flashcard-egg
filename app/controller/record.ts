@@ -313,6 +313,10 @@ export default class RecordController extends Controller {
       const filter = {
         uid: new ObjectID(ctx.uid),
         exp: { $ne: 100 },
+        inReview: false,
+        cooldownAt: {
+          $lte: new Date(),
+        },
       };
 
       const res = await db.collection(TRecord).updateMany(filter, {

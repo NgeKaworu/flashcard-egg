@@ -171,8 +171,8 @@ export default class RecordController extends Controller {
       };
       if (query.sort && query.orderby) {
         sort = {
-          ...sort,
           [query.sort]: query.orderby,
+          ...sort,
         };
       }
 

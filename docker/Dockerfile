@@ -5,7 +5,7 @@ RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 
 COPY package.json package-lock.json ./
-RUN NODE_ENV=production npm ci
+RUN npm ci
 
 COPY . .
 RUN npm run ci

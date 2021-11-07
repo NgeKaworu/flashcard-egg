@@ -10,4 +10,4 @@ RUN npm ci
 COPY . .
 RUN npm run ci
 
-CMD ["npm", "start", "--port=$ADDR --mongo=$MONGO --dbinit=$DBINIT --db=$DB"]
+CMD ["sh", "-c", "npm start"]

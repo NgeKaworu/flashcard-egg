@@ -8,10 +8,10 @@
     "declarations": true
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-flash-card-egg",
-    "stop": "egg-scripts stop --title=egg-server-flash-card-egg",
-    "dev": "egg-bin dev --port=8021 --mongo='mongodb://localhost:27017' --dbinit=false --db='flash-card'",
-    "debug": "egg-bin debug --port=8021 --mongo='mongodb://localhost:27017' --dbinit=false --db='flash-card'",
+    "start": "egg-scripts start --daemon --title=flashcard-egg",
+    "stop": "egg-scripts stop --title=flashcard-egg",
+    "dev": "egg-bin dev --port=$ADDR --mongo=$MONGO --dbinit=$DBINIT --db=$DB",
+    "debug": "egg-bin debug --port=$ADDR --mongo=$MONGO --dbinit=$DBINIT --db=$DB",
     "test-local": "egg-bin test",
     "test": "npm run lint -- --fix && npm run test-local",
     "cov": "egg-bin cov",

@@ -35,9 +35,9 @@ export default class Main implements IBoot {
     // don't need to block the app boot.
     try {
       const {
-        mongo = 'mongodb://localhost:27017',
+        mongo = 'mongodb://mongo:27017',
         dbinit = 'false',
-        db = 'flash-card',
+        db = 'flashcard',
       } = JSON.parse(process?.argv?.[2]);
       this.app.client = new MongoClient(mongo);
       await this.app.client.connect();

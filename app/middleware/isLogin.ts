@@ -1,5 +1,5 @@
 import { Context } from 'egg';
-import { ucHost } from '../../host';
+import host from '../../host';
 
 // 这里是你自定义的中间件
 export default () => async (ctx: Context, next: () => Promise<any>) => {
@@ -12,7 +12,7 @@ export default () => async (ctx: Context, next: () => Promise<any>) => {
 
   const {
     data: { data, ok },
-  } = await ctx.curl(`${ucHost()}/isLogin`, {
+  } = await ctx.curl(`${host['user-center']}/isLogin`, {
     dataType: 'json',
     headers: {
       Authorization: auth,

@@ -1,7 +1,7 @@
 import { Controller } from 'egg';
 import { retFail, retOk, retOkWithPaging } from '../resultor';
-import { Record, TRecord } from '../model/record';
-import { ObjectID } from 'mongodb';
+import { Record as Row, TRecord } from '../model/record';
+import { ObjectId } from 'mongodb';
 
 export default class RecordController extends Controller {
   public async create() {
@@ -14,9 +14,9 @@ export default class RecordController extends Controller {
         source: 'string',
         translation: 'string',
       });
-      const record: Record = {
+      const record: Row = {
         ...ctx.request.body,
-        uid: new ObjectID(ctx.uid),
+        uid: new ObjectId(ctx.uid),
         createAt: new Date(),
         cooldownAt: new Date(),
         inReview: false,
@@ -25,7 +25,7 @@ export default class RecordController extends Controller {
 
       const res = await db.collection(TRecord).insertOne(record);
       retOk(ctx, res.insertedId);
-    } catch (e) {
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }
@@ -45,11 +45,11 @@ export default class RecordController extends Controller {
       );
 
       const res = await db.collection(TRecord).findOneAndDelete({
-        _id: new ObjectID(ctx.params.id),
-        uid: new ObjectID(ctx.uid),
+        _id: new ObjectId(ctx.params.id),
+        uid: new ObjectId(ctx.uid),
       });
       retOk(ctx, res.ok);
-    } catch (e) {
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }
@@ -66,7 +66,7 @@ export default class RecordController extends Controller {
         translation: { type: 'string', required: false },
       });
 
-      const record: Record = {
+      const record: Row = {
         ...ctx.request.body,
         updateAt: new Date(),
         cooldownAt: new Date(),
@@ -74,17 +74,17 @@ export default class RecordController extends Controller {
         exp: 0,
       };
 
-      const id = new ObjectID(record.id);
+      const id = new ObjectId(record.id);
       delete record.id;
 
       const res = await db
         .collection(TRecord)
         .findOneAndUpdate(
-          { _id: id, uid: new ObjectID(ctx.uid) },
+          { _id: id, uid: new ObjectId(ctx.uid) },
           { $set: record },
         );
       retOk(ctx, res.ok);
-    } catch (e) {
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }
@@ -96,7 +96,7 @@ export default class RecordController extends Controller {
     } = this;
 
     try {
-      const query = ctx.query;
+      const query: Record<string, any> = ctx?.query as any;
       const inReview = query.inReview;
       if (inReview) {
         if (inReview === 'true') {
@@ -128,7 +128,7 @@ export default class RecordController extends Controller {
       );
 
       const filter: { [key: string]: any } = {
-        uid: new ObjectID(ctx.uid),
+        uid: new ObjectId(ctx.uid),
       };
 
       if (inReview) {
@@ -162,8 +162,8 @@ export default class RecordController extends Controller {
       }
 
       // 分布逻辑
-      const skip = query.skip || 0,
-        limit = query.limit || 10;
+      const skip = +query.skip || 0,
+        limit = +query.limit || 10;
 
       // 排序逻辑
       let sort: { [key: string]: 1 | -1 } = {
@@ -171,7 +171,7 @@ export default class RecordController extends Controller {
       };
       if (query.sort && query.orderby) {
         sort = {
-          [query.sort]: query.orderby,
+          [query.sort]: +query.orderby,
           ...sort,
         };
       }
@@ -187,7 +187,7 @@ export default class RecordController extends Controller {
       const list = await res.toArray();
 
       retOkWithPaging(ctx, list, count, hasNext);
-    } catch (e) {
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }
@@ -208,16 +208,16 @@ export default class RecordController extends Controller {
       const body = ctx.request.body;
 
       const filter = {
-        uid: new ObjectID(ctx.uid),
-        _id: { $in: body.ids?.map(ObjectID.createFromHexString) },
+        uid: new ObjectId(ctx.uid),
+        _id: { $in: body.ids?.map(ObjectId.createFromHexString) },
       };
       const res = await db.collection(TRecord).updateMany(filter, {
         $set: {
           inReview: true,
         },
       });
-      retOk(ctx, res.result);
-    } catch (e) {
+      retOk(ctx, res);
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }
@@ -232,7 +232,7 @@ export default class RecordController extends Controller {
       ctx.validate({
         num: 'int?',
       });
-      const uid = new ObjectID(ctx.uid);
+      const uid = new ObjectId(ctx.uid);
       const matcher = {
         uid,
         inReview: false,
@@ -242,17 +242,17 @@ export default class RecordController extends Controller {
       };
       const tRecord = db.collection(TRecord);
       const num = ctx.request.body.num || 3;
-      const cursor = tRecord.aggregate<Record>([
+      const cursor = tRecord.aggregate<Row>([
         { $match: matcher },
         { $sample: { size: num } },
         { $project: { _id: 1 } },
       ]);
 
       const random = await cursor.toArray();
-      const ids = random.map((i: Record) => new ObjectID(i?._id));
+      const ids = random.map((i: Row) => new ObjectId(i?._id));
 
       const filter = {
-        uid: new ObjectID(ctx.uid),
+        uid: new ObjectId(ctx.uid),
         _id: { $in: ids },
       };
       const res = await db.collection(TRecord).updateMany(filter, {
@@ -261,8 +261,8 @@ export default class RecordController extends Controller {
         },
       });
 
-      retOk(ctx, res.result);
-    } catch (e) {
+      retOk(ctx, res);
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }
@@ -281,24 +281,24 @@ export default class RecordController extends Controller {
       });
 
       const body = ctx.request.body;
-      const record: Record = {
+      const record: Row = {
         ...body,
         cooldownAt: new Date(body?.cooldownAt),
         inReview: false,
         reviewAt: new Date(),
       };
 
-      const id = new ObjectID(record.id);
+      const id = new ObjectId(record.id);
       delete record.id;
 
       const res = await db
         .collection(TRecord)
         .findOneAndUpdate(
-          { _id: id, uid: new ObjectID(ctx.uid) },
+          { _id: id, uid: new ObjectId(ctx.uid) },
           { $set: record },
         );
       retOk(ctx, res.ok);
-    } catch (e) {
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }
@@ -311,7 +311,7 @@ export default class RecordController extends Controller {
     } = this;
     try {
       const filter = {
-        uid: new ObjectID(ctx.uid),
+        uid: new ObjectId(ctx.uid),
         exp: { $ne: 100 },
         inReview: false,
         cooldownAt: {
@@ -324,8 +324,8 @@ export default class RecordController extends Controller {
           inReview: true,
         },
       });
-      retOk(ctx, res.result);
-    } catch (e) {
+      retOk(ctx, res);
+    } catch (e: any) {
       retFail(ctx, e);
     }
   }

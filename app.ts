@@ -1,5 +1,5 @@
 import { Application, IBoot } from 'egg';
-import { MongoClient, ObjectID } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import initDB from './db';
 
 import moment = require('moment');
@@ -51,7 +51,7 @@ export default class Main implements IBoot {
 
     // validator 自定义规则
     this.app.validator.addRule('_id', (_, value) => {
-      return !ObjectID.isValid(value) ? 'not object id' : undefined;
+      return !ObjectId.isValid(value) ? 'not object id' : undefined;
     });
 
     this.app.validator.addRule('moment', (_, value) => {

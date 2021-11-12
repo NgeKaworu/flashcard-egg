@@ -4,8 +4,8 @@ RUN mkdir -p /home/node/app
 
 WORKDIR /home/node/app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json package-lock.json yarn.lock ./
+RUN yarn --frozen-lockfile --registry=http://registry.npmmirror.com
 
 COPY . .
 RUN npm run ci && \

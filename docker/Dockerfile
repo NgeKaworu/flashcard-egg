@@ -8,7 +8,7 @@ COPY package.json package-lock.json yarn.lock ./
 RUN yarn --frozen-lockfile --registry=http://registry.npmmirror.com
 
 COPY . .
-RUN npm run ci && \
+RUN npm run tsc && \
     tar -c ../build . 
 
 FROM node:lts-alpine
